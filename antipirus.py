@@ -2,6 +2,8 @@
 dangerlist = ["ngrok.io","servo.net","subprocess","os.system","sudo rm -rf","socket","connect(","hack","pwn","virus"]
 #If you're reading this on your alert pane, don't worry. This is the list of known-bad words, so every single one of them will trip. It's like checking if 1,2, or 3 is in the list 1,2,3. But props for being paranoid ;)
 
+#PLEASE READ THE LICENSE INFORMATION BEFORE USING OR DISTRIBUTING THIS CODE!!! LEGAL ACTION CAN AND WILL BE TAKEN AGAINST VIOLATORS!
+
 import sys
 import hashlib
 
