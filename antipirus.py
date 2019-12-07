@@ -1,16 +1,18 @@
 #The list of triggers. Please feel free to add more. Make sure all are in lowercase.
-dangerlist = ["ngrok.io","servo.net","subprocess","os.system","sudo rm -rf","socket","connect(","hack","pwn","virus"]
+dangerlist = ["ngrok.io","shell","worm","servo.net","subprocess","os.system","sudo rm -rf","socket","connect(","hack","pwn","virus"]
 #If you're reading this on your alert pane, don't worry. This is the list of known-bad words, so every single one of them will trip. It's like checking if 1,2, or 3 is in the list 1,2,3. But props for being paranoid ;)
-
-#PLEASE READ THE LICENSE INFORMATION BEFORE USING OR DISTRIBUTING THIS CODE!!! LEGAL ACTION CAN AND WILL BE TAKEN AGAINST VIOLATORS!
 #By using this code you state that you have read and agree to the license agreement.
 
 import sys
 import hashlib
+import sys
 
-print("AntiPirus 1.0")
+print("AntiPirus 1.1")
 print("Enter a .py file to determine potential risk")
-filename=raw_input("FILE > ")
+if len(sys.argv) < 2:
+    filename=raw_input("FILE > ")
+else:
+    filename = sys.argv[1]
 try:
     f = open(filename,"r")
 except:
@@ -25,6 +27,8 @@ for line in contents:
     line=line.lower().lstrip().strip("   ").strip("\x0B")#Strip extra whitespace mid-code - helps eliminate some obfuscation
     lines+=1
     onthisline=0
+    addedthisline = []
+    skip = False
     for word in dangerlist:
         if word in line:
             if line[:1]=="#" and "hack" not in line and "pwn" not in line:
@@ -33,10 +37,22 @@ for line in contents:
                 if line[:len("except ")]=="except ":
                     pass #Who hates error handling?
 
-                if line[:len("import ")]=="import ":
+                if line[:len('import')] == 'import' or line[:5] == 'from ':
                     print("\n[!] Potentially hazardous import located on line {}.\nThis may not be malicious, but could be used to assist in malicious deeds.\n{}Item of alarm:\n{}".format(lines,line,word))
                     maliciouslines+=1
                     onthisline+=1
+                    if 'as' in line:
+                        skip = False
+                        for addedalias in addedthisline:
+                            if 'as {}'.format(addedalias) in line:
+                                skip = True
+
+                        if skip == False:
+                            onthisline+=1
+                            print("\n[!] Malicious import aliasing on line {}.\nThis is an obfuscation tactic! Adding to badwords...\n{}Item of alarm:\n{}".format(lines,line,word))
+                            alias = line.split("as ")[1]
+                            dangerlist.append(alias)
+                            addedthisline.append(alias)
                 else:
                     print("\n[!] Potentially malicious line found on line {}! \n{}Item of alarm:\n{}".format(lines,line,word))
                     maliciouslines+=1
